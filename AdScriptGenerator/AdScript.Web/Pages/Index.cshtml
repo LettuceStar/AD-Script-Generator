@@ -1,19 +1,44 @@
 ﻿@page
-@model IndexModel
-@{
-    ViewData["Title"] = "AD Script Generator";
-}
+@model AdScript.Web.Pages.IndexModel
 
-<h1>AD Script Generator</h1>
+<h2>AD Script Generator</h2>
 
 <form method="post">
-    <button type="submit" class="btn btn-primary" asp-page-handler="Generate">
-        Generate Simone Command
-    </button>
-</form>
+    <div>
+        <label>First Name</label><br />
+        <input asp-for="Input.FirstName" />
+    </div>
+    <br />
 
-@if (!string.IsNullOrWhiteSpace(Model.GeneratedCommand))
-{
-    <h3>Generated PowerShell Command</h3>
-    <pre style="white-space: pre-wrap;">@Model.GeneratedCommand</pre>
-}
+    <div>
+        <label>Last Name</label><br />
+        <input asp-for="Input.LastName" />
+    </div>
+    <br />
+
+    <div>
+        <label>Employee ID</label><br />
+        <input asp-for="Input.EmployeeId" />
+    </div>
+    <br />
+
+    <div>
+        <label>Campus</label><br />
+        <input asp-for="Input.Campus" />
+    </div>
+    <br />
+
+    <div>
+        <label>Team</label><br />
+        <input asp-for="Input.Team" />
+    </div>
+    <br />
+
+    <div>
+        <label>UPN Suffix</label><br />
+        <input asp-for="Input.UpnSuffix" placeholder="@@cats.local" />
+    </div>
+    <br />
+
+    <button type="submit">Submit</button>
+</form>

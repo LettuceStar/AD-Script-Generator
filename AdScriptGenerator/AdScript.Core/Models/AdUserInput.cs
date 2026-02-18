@@ -15,5 +15,6 @@ namespace AdScript.Core.Models
         public string EmployeeId { get; set; } = string.Empty;
         public string Campus { get; set; } = string.Empty;
         public string Team { get; set; } = string.Empty;
+        public string UpnSuffix { get; set; } = string.Empty;
     }
 }
