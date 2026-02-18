@@ -1,20 +1,42 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using AdScript.Core.Models;
+using AdScript.Core.Services;
 
-namespace AdScript.Web.Pages
+namespace AdScript.Web.Pages;
+
+public class IndexModel : PageModel
 {
-    public class IndexModel : PageModel
+    [BindProperty]
+    public string? GeneratedCommand { get; set; }
+
+    public void OnGet()
     {
-        private readonly ILogger<IndexModel> _logger;
+    }
 
-        public IndexModel(ILogger<IndexModel> logger)
+    public void OnPostGenerate()
+    {
+        // Test input
+        var input = new AdUserInput
         {
-            _logger = logger;
-        }
+            FirstName = "Simone",
+            LastName = "Emma-Peartree",
+            EmployeeId = "205",
+            Campus = "HBT",
+            Team = "Chief_Executive_Officer"
+        };
+                
+        var generator = new PowerShellScriptGenerator();
 
-        public void OnGet()
-        {
-
-        }
+        GeneratedCommand = generator.GenerateNewAdUserCommand(
+            input,
+            upnSuffix: "cats.local",
+            domainDn: "DC=cats,DC=local",
+            staffOu: "Staff",
+            defaultPassword: "Password1",
+            enabled: true,
+            changePasswordAtLogon: false,
+            passwordNeverExpires: true
+        );
     }
 }

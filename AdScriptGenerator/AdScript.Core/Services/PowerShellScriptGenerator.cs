@@ -13,8 +13,8 @@ public class PowerShellScriptGenerator
         string staffOu = "Staff",
         string defaultPassword = "Password1",
         bool enabled = true,
-        bool changePasswordAtLogon = true,
-        bool passwordNeverExpires = false)
+        bool changePasswordAtLogon = false,
+        bool passwordNeverExpires = true)
     {
         if (input is null) throw new ArgumentNullException(nameof(input));
 
