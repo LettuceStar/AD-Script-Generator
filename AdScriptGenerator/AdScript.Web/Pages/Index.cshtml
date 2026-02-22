@@ -40,5 +40,47 @@
     </div>
     <br />
 
-    <button type="submit">Submit</button>
+    <button type="submit" asp-page-handler="Generate">
+        Generate
+    </button>
+
+
 </form>
+
+@if (!string.IsNullOrWhiteSpace(Model.GeneratedCommand))
+{
+    <hr />
+    <h3>Generated Command</h3>
+
+    <pre id="cmd" style="white-space: pre-wrap; padding: 12px; border: 1px solid #ccc;">
+        @Model.GeneratedCommand
+    </pre>
+
+    <button type="button" onclick="copyCommand()" id="copyBtn">
+        Copy
+    </button>
+
+    <span id="copyMessage" style="color: green; margin-left: 10px; display: none;">
+        Copied!
+    </span>
+
+    <script>
+        function copyCommand() {
+            const text = document.getElementById('cmd').innerText;
+
+            navigator.clipboard.writeText(text).then(function () {
+                const msg = document.getElementById('copyMessage');
+                msg.style.display = "inline";
+
+                setTimeout(function () {
+                    msg.style.display = "none";
+                }, 3000);
+            });
+        }
+    </script>
+
+}
+
+
+
+
