@@ -4,39 +4,48 @@
 <h2>AD Script Generator</h2>
 
 <form method="post">
+
+    <div asp-validation-summary="All" style="color: red; margin-bottom: 12px;"></div>
+
     <div>
         <label>First Name</label><br />
         <input asp-for="Input.FirstName" />
+        <span asp-validation-for="Input.FirstName" style="color: red;"></span>
     </div>
     <br />
 
     <div>
         <label>Last Name</label><br />
         <input asp-for="Input.LastName" />
+        <span asp-validation-for="Input.LastName" style="color: red;"></span>
     </div>
     <br />
 
     <div>
         <label>Employee ID</label><br />
         <input asp-for="Input.EmployeeId" />
+        <span asp-validation-for="Input.EmployeeId" style="color: red;"></span>
     </div>
     <br />
 
     <div>
         <label>Campus</label><br />
         <input asp-for="Input.Campus" />
+        <span asp-validation-for="Input.Campus" style="color: red;"></span>
     </div>
     <br />
 
     <div>
         <label>Team</label><br />
         <input asp-for="Input.Team" />
+        <span asp-validation-for="Input.Team" style="color: red;"></span>
     </div>
     <br />
 
     <div>
         <label>UPN Suffix</label><br />
         <input asp-for="Input.UpnSuffix" placeholder="@@cats.local" />
+        <span asp-validation-for="Input.UpnSuffix" style="color: red;"></span>
     </div>
     <br />
 
@@ -81,6 +90,10 @@
 
 }
 
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
 
 
 

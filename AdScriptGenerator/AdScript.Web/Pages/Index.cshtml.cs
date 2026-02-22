@@ -20,6 +20,12 @@ public class IndexModel : PageModel
 
     public void OnPostGenerate()
     {
+        if (!ModelState.IsValid)
+        {
+            GeneratedCommand = null; 
+            return;
+        }
+
         var generator = new PowerShellScriptGenerator();
 
         GeneratedCommand = generator.GenerateNewAdUserCommand(
