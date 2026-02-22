@@ -1,7 +1,15 @@
+using AdScript.Core.Models;
+using AdScript.Core.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+
+builder.Services.Configure<AdScriptOptions>(
+    builder.Configuration.GetSection("AdScript"));
+
+builder.Services.AddScoped<IScriptGenerator, PowerShellScriptGenerator>();
 
 var app = builder.Build();
 

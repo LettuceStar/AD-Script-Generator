@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using AdScript.Core.Models;
 using AdScript.Core.Services;
+using Microsoft.Extensions.Options;
 
 namespace AdScript.Web.Pages;
 
@@ -13,6 +14,17 @@ public class IndexModel : PageModel
 
     [BindProperty]
     public AdUserInput Input { get; set; } = new();
+
+    private readonly IScriptGenerator _generator;
+
+        
+
+    public IndexModel(
+        IScriptGenerator generator)
+    {
+        _generator = generator;
+    }
+
 
     public void OnGet()
     {
@@ -26,18 +38,8 @@ public class IndexModel : PageModel
             return;
         }
 
-        var generator = new PowerShellScriptGenerator();
+        GeneratedCommand = _generator.GenerateNewAdUserCommand(Input);
 
-        GeneratedCommand = generator.GenerateNewAdUserCommand(
-            Input,
-            upnSuffix: Input.UpnSuffix,
-            domainDn: "DC=cats,DC=local",
-            staffOu: "Staff",
-            defaultPassword: "Password1",
-            enabled: true,
-            changePasswordAtLogon: false,
-            passwordNeverExpires: true
-        );
-        }
+    }
 
 }

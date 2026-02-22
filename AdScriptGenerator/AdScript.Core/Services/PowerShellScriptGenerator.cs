@@ -1,20 +1,20 @@
 ﻿using System.Text;
 using AdScript.Core.Models;
 using System;
+using Microsoft.Extensions.Options;
 
 namespace AdScript.Core.Services;
 
-public class PowerShellScriptGenerator
+public class PowerShellScriptGenerator : IScriptGenerator
 {
+    private readonly AdScriptOptions _options;
+
+    public PowerShellScriptGenerator(IOptions<AdScriptOptions> options)
+    {
+        _options = options.Value;
+    }
     public string GenerateNewAdUserCommand(
-        AdUserInput input,
-        string upnSuffix = "cats.local",
-        string domainDn = "DC=cats,DC=local",
-        string staffOu = "Staff",
-        string defaultPassword = "Password1",
-        bool enabled = true,
-        bool changePasswordAtLogon = false,
-        bool passwordNeverExpires = true)
+        AdUserInput input)
     {
         if (input is null) throw new ArgumentNullException(nameof(input));
 
@@ -34,15 +34,17 @@ public class PowerShellScriptGenerator
         sam = Truncate(sam, 20);
 
         // UPN
-        upnSuffix = (upnSuffix ?? string.Empty).Trim().TrimStart('@');
+        var upnSuffix = (input.UpnSuffix ?? string.Empty).Trim().TrimStart('@');
         var upn = $"{sam}@{upnSuffix}";
 
         // OU Path (Team -> Campus -> Staff -> Domain)
         var teamOu = (input.Team ?? string.Empty).Trim();
         var campusOu = (input.Campus ?? string.Empty).Trim();
-        var path = $"OU={teamOu},OU={campusOu},OU={staffOu},{domainDn}";
+        var path = $"OU={teamOu},OU={campusOu},OU={_options.StaffOu},{_options.DomainDn}";
 
         // Flag rule: PasswordNeverExpires=true => ChangePasswordAtLogon must be false
+        var changePasswordAtLogon = _options.ChangePasswordAtLogon;
+        var passwordNeverExpires = _options.PasswordNeverExpires;
         if (passwordNeverExpires)
             changePasswordAtLogon = false;
 
@@ -56,8 +58,8 @@ public class PowerShellScriptGenerator
         sb.Append($" -SamAccountName \"{EscapePs(sam)}\"");
         sb.Append($" -UserPrincipalName \"{EscapePs(upn)}\"");
         sb.Append($" -Path \"{EscapePs(path)}\"");
-        sb.Append($" -AccountPassword (ConvertTo-SecureString \"{EscapePs(defaultPassword)}\" -AsPlainText -Force)");
-        sb.Append($" -Enabled {(enabled ? "$true" : "$false")}");
+        sb.Append($" -AccountPassword (ConvertTo-SecureString \"{EscapePs(_options.DefaultPassword)}\" -AsPlainText -Force)");
+        sb.Append($" -Enabled {(_options.Enabled ? "$true" : "$false")}");
         sb.Append($" -ChangePasswordAtLogon {(changePasswordAtLogon ? "$true" : "$false")}");
         sb.Append($" -PasswordNeverExpires {(passwordNeverExpires ? "$true" : "$false")}");
 
