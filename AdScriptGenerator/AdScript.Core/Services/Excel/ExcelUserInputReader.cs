@@ -21,7 +21,7 @@ namespace AdScript.Core.Services.Excel
             var ws = wb.Worksheets.FirstOrDefault();
             if (ws is null)
             {
-                result.Errors.Add("Excel don't have worksheet。");
+                result.Errors.Add("The Excel file does not contain any worksheet.");
                 return Task.FromResult(result);
             }
 

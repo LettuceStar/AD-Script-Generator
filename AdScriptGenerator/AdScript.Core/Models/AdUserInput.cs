@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -25,7 +26,7 @@ public class AdUserInput
     [RegularExpression(@"^[A-Za-z0-9_-]+$", ErrorMessage = "Campus can only contain letters, numbers, _ or -.")]
     public string Campus { get; set; } = string.Empty;
 
-    [Required, MaxLength(50)]
+    [MaxLength(50)]
     [RegularExpression(@"^[A-Za-z0-9_-]+$", ErrorMessage = "Team can only contain letters, numbers, _ or -.")]
     public string Team { get; set; } = string.Empty;
 

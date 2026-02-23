@@ -1,7 +1,7 @@
 ﻿@page
 @model AdScript.Web.Pages.IndexModel
 
-<h2>AD Script Generator</h2>
+<h2>Single user</h2>
 
 <form method="post">
 
@@ -98,7 +98,7 @@
 
 <hr />
 
-<h2>Excel Upload</h2>
+<h2>Bulk (Excel)</h2>
 
 <form method="post" enctype="multipart/form-data" asp-page-handler="Upload">
     <div>
@@ -178,3 +178,55 @@
         Showing first 50 errors.
     </div>
 }
+
+@if (Model.Commands?.Count > 0)
+{
+    <hr />
+    <h3>Generated commands (@Model.Commands.Count)</h3>
+
+    <ul>
+        @foreach (var c in Model.Commands.Take(50))
+        {
+            <li><code>@c</code></li>
+        }
+    </ul>
+
+    <div style="margin-top:8px;">
+        Showing first 50 commands.
+    </div>
+
+    <h3>Combined script</h3>
+    <pre id="allCmd" style="white-space: pre-wrap; padding: 12px; border: 1px solid #ccc;">@Model.CombinedScript</pre>
+
+    <button type="button" onclick="copyAll()" id="copyAllBtn">Copy all</button>
+    <span id="copyAllMessage" style="color: green; margin-left: 10px; display: none;">Copied!</span>
+
+    <script>
+        function copyAll() {
+            const text = document.getElementById('allCmd').innerText;
+
+            navigator.clipboard.writeText(text).then(function () {
+                const msg = document.getElementById('copyAllMessage');
+                msg.style.display = "inline";
+
+                setTimeout(function () {
+                    msg.style.display = "none";
+                }, 3000);
+            });
+        }
+    </script>
+
+    @if (Model.ErrorCount > 0)
+    {
+        <div style="color:#b00020; margin-top:8px;">
+            Fix validation errors before downloading.
+        </div>
+    }
+
+    <form method="post" asp-page-handler="Download" style="margin-top:12px;">
+        <textarea name="CombinedScript" hidden>@Model.CombinedScript</textarea>
+        <input type="hidden" name="DownloadFileName" value="@Model.DownloadFileName" />
+        <button type="submit" @(Model.ErrorCount > 0 ? "disabled" : "")>Download .ps1</button>
+    </form>
+}
+
