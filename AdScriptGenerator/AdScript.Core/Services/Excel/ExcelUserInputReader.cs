@@ -1,39 +1,21 @@
-﻿using AdScript.Core.Excel;
-using AdScript.Core.Models;
+﻿using AdScript.Core.Models;
 using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Spreadsheet;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
+
 
 namespace AdScript.Core.Services.Excel
 {
     public sealed class ExcelUserInputReader : IExcelUserInputReader
     {
-        
-        private static readonly Dictionary<string, Func<IXLRow, Dictionary<string, int>, string>> Getters =
-            new(StringComparer.OrdinalIgnoreCase)
-            {
-                ["FirstName"] = (row, map) => GetCell(row, map, "FirstName", "First Name"),
-                ["LastName"] = (row, map) => GetCell(row, map, "LastName", "Last Name"),
-
-                // Excel header can be ID, but model property is EmployeeId (recommended for now)
-                ["ID"] = (row, map) => GetCell(row, map, "EmployeeId", "ID", "Employee ID"),
-
-                ["Campus"] = (row, map) => GetCell(row, map, "Campus"),
-
-                // These columns may not exist in your current Excel — return empty string safely
-                ["Team"] = (row, map) => GetCell(row, map, "Team"),
-                ["UpnSuffix"] = (row, map) => GetCell(row, map, "UpnSuffix", "UPN Suffix", "UPNSuffix"),
-                // you can also add Department / Title / Groups / Email 
-
-            };
+        private readonly AdScriptOptions _options;
+        public ExcelUserInputReader(IOptions<AdScriptOptions> options)
+        {
+            _options = options.Value;
+        }
 
         public Task<ExcelReadResult<AdUserInput>> ReadAsync(Stream xlsxStream, CancellationToken ct = default)
         {
-            var result = new ExcelReadResult<AdUserInput> { Rows = new List<AdUserInput>() };
+            var result = new ExcelReadResult<AdUserInput>();
 
             using var wb = new XLWorkbook(xlsxStream);
             var ws = wb.Worksheets.FirstOrDefault();
@@ -50,9 +32,24 @@ namespace AdScript.Core.Services.Excel
                 return Task.FromResult(result);
             }
 
-            // read from first line
-            var headerRow = used.FirstRow();
-            var headerMap = BuildHeaderMap(headerRow);
+
+            // Find header row (do not assume it's the first row)
+            var headerRow = HeaderRowDetector.FindHeaderRow(used);
+
+            if (headerRow is null)
+            {
+                result.Errors.Add("Scanned first 50 rows, " +
+                    "did not find a row containing required headers: Id, FirstName, LastName.");
+                return Task.FromResult(result);
+            }
+
+            // Build canonical header map using aliases
+            var headerMap = HeaderMapBuilder.BuildCanonicalHeaderMap(headerRow);
+
+            // File-level required header validation (keep a single source of truth)
+            HeaderRowDetector.ValidateRequiredHeaders(headerMap, result.Errors);
+            if (result.Errors.Count > 0)
+                return Task.FromResult(result);
 
             // read data from second line, until last used line
             var firstDataRowNumber = headerRow.RowNumber() + 1;
@@ -64,68 +61,66 @@ namespace AdScript.Core.Services.Excel
 
                 var row = ws.Row(r);
 
-                // skip empty rows (you can also choose to treat them as errors if you want)
-                if (row.Cell(1).IsEmpty()) continue;
+                // Skip completely empty rows
+                if (IsRowEmpty(row)) continue;
 
                 var input = new AdUserInput
                 {
-                    // depend your AdUserInput properties, and also you can do some simple
-                    // transformation here if needed (like trimming, case conversion, etc.)                    
-                    FirstName = Getters["FirstName"](row, headerMap),
-                    LastName = Getters["LastName"](row, headerMap),
-                    ID = Getters["ID"](row, headerMap),
-                    Campus = Getters["Campus"](row, headerMap),
-                    Team = Getters["Team"](row, headerMap),
-                    UpnSuffix = Getters["UpnSuffix"](row, headerMap),
+                    // Canonical reads
+                    FirstName = ReadCell(row, headerMap, HeaderAliases.FirstName),
+                    LastName = ReadCell(row, headerMap, HeaderAliases.LastName),
+                    ID = ReadCell(row, headerMap, HeaderAliases.ID),
+                    Campus = ReadCell(row, headerMap, HeaderAliases.Campus),
+                    Team = ReadCell(row, headerMap, HeaderAliases.Team),
+                    UpnSuffix = ReadCell(row, headerMap, HeaderAliases.UpnSuffix),
 
                 };
 
-                // simple validation example: check required fields
-                if (string.IsNullOrWhiteSpace(input.FirstName) ||
-                    string.IsNullOrWhiteSpace(input.LastName) ||
-                    string.IsNullOrWhiteSpace(input.ID))
+                // Apply defaults from Options (B: UpnSuffix defaulted)
+                if (string.IsNullOrWhiteSpace(input.UpnSuffix))
+                    input.UpnSuffix = _options.DefaultUpnSuffix;
+
+                if (string.IsNullOrWhiteSpace(input.Team))
+                    input.Team = _options.DefaultTeam;
+
+                if (string.IsNullOrWhiteSpace(input.Campus))
+                    input.Campus = _options.DefaultCampus;
+
+                // Basic required checks (M2 will do full DataAnnotations validation)
+                if (string.IsNullOrWhiteSpace(input.ID) ||
+                    string.IsNullOrWhiteSpace(input.FirstName) ||
+                    string.IsNullOrWhiteSpace(input.LastName))
                 {
-                    result.Errors.Add($"Row {r}: FirstName / LastName / ID is required.");
+                    result.Errors.Add($"Row {r}: ID / First Name / Last Name is required.");
                     continue;
                 }
 
-                if (string.IsNullOrWhiteSpace(input.Team))
-                    input.Team = "IT";
 
-                if (string.IsNullOrWhiteSpace(input.UpnSuffix))
-                    input.UpnSuffix = "@cats.local";
-
-                result.Rows.Add(input);
+                result.Rows.Add((r, input));
             }
 
             return Task.FromResult(result);
         }
 
-        private static Dictionary<string, int> BuildHeaderMap(IXLRangeRow headerRow)
+
+        private static string ReadCell(IXLRow row, Dictionary<string, int> map, string canonicalKey)
         {
-            var map = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-
-            foreach (var cell in headerRow.CellsUsed())
-            {
-                var name = cell.GetString().Trim();
-                if (!string.IsNullOrWhiteSpace(name))
-                {
-                    map[name] = cell.Address.ColumnNumber;
-                }
-            }
-
-            return map;
+            if (!map.TryGetValue(canonicalKey, out var col)) return string.Empty;
+            return row.Cell(col).GetString().Trim();
         }
 
-        private static string GetCell(IXLRow row, Dictionary<string, int> map, params string[] headers)
-        {
-            foreach (var h in headers)
-            {
-                if (map.TryGetValue(h, out var col))
-                    return row.Cell(col).GetString().Trim();
-            }
 
-            return string.Empty;
+        private static bool IsRowEmpty(IXLRow row)
+        {
+            // Consider row empty if all used cells are empty
+            foreach (var c in row.CellsUsed())
+            {
+                if (!c.IsEmpty() && !string.IsNullOrWhiteSpace(c.GetString()))
+                    return false;
+            }
+            return true;
         }
+
+
     }
 }

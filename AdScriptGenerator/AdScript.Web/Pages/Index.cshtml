@@ -147,3 +147,34 @@
     </table>
 }
 
+@if (Model.ErrorCount > 0)
+{
+    <div style="margin-top:12px; color:#b00020;">
+        <strong>Validation errors:</strong> @Model.ErrorCount
+        <div>Valid rows: @Model.ValidRowCount / @Model.TotalRows</div>
+    </div>
+
+    <table border="1" cellpadding="6" cellspacing="0" style="margin-top:12px;">
+        <thead>
+            <tr>
+                <th>Row</th>
+                <th>Field</th>
+                <th>Message</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var e in Model.RowErrors.Take(50))
+            {
+                <tr>
+                    <td>@e.RowNumber</td>
+                    <td>@e.Field</td>
+                    <td>@e.Message</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div style="margin-top:8px;">
+        Showing first 50 errors.
+    </div>
+}

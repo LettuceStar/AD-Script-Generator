@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AdScript.Core.Excel;
+namespace AdScript.Core.Services.Excel;
 
 public interface IExcelUserInputReader
 {

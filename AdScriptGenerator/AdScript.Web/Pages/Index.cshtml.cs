@@ -3,12 +3,13 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using AdScript.Core.Models;
 using Microsoft.Extensions.Options;
 using AdScript.Core.Services.Script;
-using AdScript.Core.Excel;
+using AdScript.Core.Services.Excel;
 
 namespace AdScript.Web.Pages;
 
 
-public class IndexModel(IScriptGenerator generator, IExcelUserInputReader reader) : PageModel
+public class IndexModel(IScriptGenerator generator, IExcelUserInputReader reader,
+    IExcelUserInputValidator validator) : PageModel
 {
     [BindProperty]
     public string? GeneratedCommand { get; set; }
@@ -19,6 +20,7 @@ public class IndexModel(IScriptGenerator generator, IExcelUserInputReader reader
     private readonly IScriptGenerator _generator = generator;
 
     private readonly IExcelUserInputReader _reader = reader;
+    private readonly IExcelUserInputValidator _validator = validator;
 
 
     [BindProperty]
@@ -29,7 +31,10 @@ public class IndexModel(IScriptGenerator generator, IExcelUserInputReader reader
     public int TotalRows { get; set; }
     public List<AdUserInput> PreviewRows { get; set; } = new();
 
+    public int ValidRowCount { get; set; }
+    public int ErrorCount { get; set; }
 
+    public List<ExcelRowError> RowErrors { get; set; } = new();
 
     public void OnGet()
     {
@@ -77,19 +82,24 @@ public class IndexModel(IScriptGenerator generator, IExcelUserInputReader reader
 
         if (read.Errors.Count > 0 && read.Rows.Count == 0)
         {
-            ErrorMessage = "Read failed：\n" + string.Join("\n", read.Errors.Take(5));
+            ErrorMessage = string.Join("\n", read.Errors);
             return Page();
         }
         
         TotalRows = read.Rows.Count;
-        PreviewRows = read.Rows.Take(10).ToList();
 
-        // simple error reporting: if there are errors but we still have some valid rows,
-        // we show a message with error count and an example error
-        if (read.Errors.Count > 0)
-        {
-            ErrorMessage = $"there is {read.Errors.Count} lines were skipped（example：{read.Errors[0]}）";
-        }
+        var validated = _validator.Validate(read.Rows);
+
+        ValidRowCount = validated.TotalValidRows;
+        ErrorCount = validated.TotalErrors;
+
+        RowErrors = validated.Errors;
+
+        // Preview only valid rows
+        PreviewRows = validated.ValidRows
+            .Select(x => x.Row)
+            .Take(10)
+            .ToList();
 
         return Page();
     }

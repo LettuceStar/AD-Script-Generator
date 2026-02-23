@@ -1,6 +1,5 @@
-using AdScript.Core.Excel;
-using AdScript.Core.Models;
 using AdScript.Core.Services.Excel;
+using AdScript.Core.Models;
 using AdScript.Core.Services.Script;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,12 +8,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 
 builder.Services.Configure<AdScriptOptions>(
-    builder.Configuration.GetSection("AdScript"));
+    builder.Configuration.GetSection("AdScriptOptions"));
 
 builder.Services.AddScoped<IScriptGenerator, PowerShellScriptGenerator>();
 
 builder.Services.AddScoped<IExcelUserInputReader, ExcelUserInputReader>();
 
+builder.Services.AddScoped<IExcelUserInputValidator, ExcelUserInputValidator>();
 
 var app = builder.Build();
 

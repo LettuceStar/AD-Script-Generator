@@ -14,5 +14,8 @@ namespace AdScript.Core.Models
         public bool Enabled { get; set; } = true;
         public bool ChangePasswordAtLogon { get; set; }
         public bool PasswordNeverExpires { get; set; } = true;
+        public string DefaultUpnSuffix { get; init; } = "@cats.local";
+        public string DefaultTeam { get; init; } = "IT";
+        public string DefaultCampus { get; init; } = "HBT";
     }
 }
