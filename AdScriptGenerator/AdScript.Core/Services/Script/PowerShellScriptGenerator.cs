@@ -3,7 +3,7 @@ using AdScript.Core.Models;
 using System;
 using Microsoft.Extensions.Options;
 
-namespace AdScript.Core.Services;
+namespace AdScript.Core.Services.Script;
 
 public class PowerShellScriptGenerator : IScriptGenerator
 {

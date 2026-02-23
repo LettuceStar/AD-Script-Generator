@@ -23,8 +23,8 @@
 
     <div>
         <label>Employee ID</label><br />
-        <input asp-for="Input.EmployeeId" />
-        <span asp-validation-for="Input.EmployeeId" style="color: red;"></span>
+        <input asp-for="Input.ID" />
+        <span asp-validation-for="Input.ID" style="color: red;"></span>
     </div>
     <br />
 
@@ -96,4 +96,54 @@
 }
 
 
+<hr />
+
+<h2>Excel Upload</h2>
+
+<form method="post" enctype="multipart/form-data" asp-page-handler="Upload">
+    <div>
+        <input type="file" asp-for="UploadFile" accept=".xlsx" />
+        <button type="submit">Upload</button>
+    </div>
+</form>
+
+@if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+{
+    <div style="color:red; margin-top:12px;">@Model.ErrorMessage</div>
+}
+
+@if (Model.TotalRows > 0)
+{
+    <div style="margin-top:12px;">
+        <strong>Total rows:</strong> @Model.TotalRows
+    </div>
+
+    <h3>Preview (first @Model.PreviewRows.Count rows)</h3>
+
+    <table border="1" cellpadding="6" cellspacing="0">
+        <thead>
+            <tr>
+                <th>FirstName</th>
+                <th>LastName</th>
+                <th>ID</th>
+                <th>Campus</th>
+                <th>Team</th>
+                <th>UpnSuffix</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in Model.PreviewRows)
+            {
+                <tr>
+                    <td>@r.FirstName</td>
+                    <td>@r.LastName</td>
+                    <td>@r.ID</td>
+                    <td>@r.Campus</td>
+                    <td>@r.Team</td>
+                    <td>@r.UpnSuffix</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 

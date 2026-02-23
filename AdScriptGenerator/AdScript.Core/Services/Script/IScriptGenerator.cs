@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AdScript.Core.Services
+namespace AdScript.Core.Services.Script
 {
     public interface IScriptGenerator
     {

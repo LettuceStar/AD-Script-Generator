@@ -18,8 +18,8 @@ public class AdUserInput
     public string LastName { get; set; } = string.Empty;
 
     [Required, MaxLength(20)]
-    [RegularExpression(@"^[A-Za-z0-9]+$", ErrorMessage = "EmployeeId can only contain letters and numbers.")]
-    public string EmployeeId { get; set; } = string.Empty;
+    [RegularExpression(@"^[A-Za-z0-9]+$", ErrorMessage = "ID can only contain letters and numbers.")]
+    public string ID { get; set; } = string.Empty;
 
     [Required, MaxLength(10)]
     [RegularExpression(@"^[A-Za-z0-9_-]+$", ErrorMessage = "Campus can only contain letters, numbers, _ or -.")]
