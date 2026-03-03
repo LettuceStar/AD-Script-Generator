@@ -102,6 +102,14 @@
 
 <form method="post" enctype="multipart/form-data" asp-page-handler="Upload">
     <div>
+        <label>Account Type</label>
+        <select asp-for="UploadAccountType">
+            <option value="Staff">Staff</option>
+            <option value="Student">Student</option>
+        </select>
+    </div>
+
+    <div>
         <input type="file" asp-for="UploadFile" accept=".xlsx" />
         <button type="submit">Upload</button>
     </div>

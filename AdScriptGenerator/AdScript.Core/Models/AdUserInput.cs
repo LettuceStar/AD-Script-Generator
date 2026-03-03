@@ -18,6 +18,10 @@ public class AdUserInput
     [Required, MaxLength(50)]
     public string LastName { get; set; } = string.Empty;
 
+    public enum AdAccountType { Staff, Student }
+
+    public AdAccountType AccountType { get; set; } = AdAccountType.Staff;
+
     [Required, MaxLength(20)]
     [RegularExpression(@"^[A-Za-z0-9]+$", ErrorMessage = "ID can only contain letters and numbers.")]
     public string ID { get; set; } = string.Empty;

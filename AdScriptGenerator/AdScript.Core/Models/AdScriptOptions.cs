@@ -10,6 +10,7 @@ namespace AdScript.Core.Models
     {
         public string DomainDn { get; set; } = string.Empty;
         public string StaffOu { get; set; } = string.Empty;
+        public string StudentsOu { get; init; } = "Students";
         public string DefaultPassword { get; set; } = string.Empty;
         public bool Enabled { get; set; } = true;
         public bool ChangePasswordAtLogon { get; set; }

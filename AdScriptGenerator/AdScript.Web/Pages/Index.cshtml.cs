@@ -4,6 +4,7 @@ using AdScript.Core.Models;
 using AdScript.Core.Services.Script;
 using AdScript.Core.Services.Excel;
 using System.Text;
+using static AdScript.Core.Models.AdUserInput;
 
 namespace AdScript.Web.Pages;
 
@@ -29,6 +30,9 @@ public class IndexModel(IScriptGenerator generator, IExcelUserInputReader reader
 
     private readonly IExcelUserInputReader _reader = reader;
     private readonly IExcelUserInputValidator _validator = validator;
+
+    [BindProperty]
+    public AdAccountType UploadAccountType { get; set; } = AdAccountType.Staff;
 
 
     [BindProperty]
@@ -100,7 +104,14 @@ public class IndexModel(IScriptGenerator generator, IExcelUserInputReader reader
         
         TotalRows = read.Rows.Count;
 
+
         var validated = _validator.Validate(read.Rows);
+
+
+        foreach (var v in validated.ValidRows)
+        {
+            v.Row.AccountType = UploadAccountType;
+        }
 
         ValidRowCount = validated.TotalValidRows;
         ErrorCount = validated.TotalErrors;

@@ -2,6 +2,7 @@
 using AdScript.Core.Models;
 using System;
 using Microsoft.Extensions.Options;
+using static AdScript.Core.Models.AdUserInput;
 
 namespace AdScript.Core.Services.Script;
 
@@ -37,10 +38,27 @@ public class PowerShellScriptGenerator : IScriptGenerator
         var upnSuffix = (input.UpnSuffix ?? string.Empty).Trim().TrimStart('@');
         var upn = $"{sam}@{upnSuffix}";
 
+        // Build OU path dynamically, skipping empty segments
+        var ous = new List<string>();
+
         // OU Path (Team -> Campus -> Staff -> Domain)
         var teamOu = (input.Team ?? string.Empty).Trim();
         var campusOu = (input.Campus ?? string.Empty).Trim();
-        var path = $"OU={teamOu},OU={campusOu},OU={_options.StaffOu},{_options.DomainDn}";
+
+        var path = BuildOuPath(input);
+
+        // var path = $"OU={teamOu},OU={campusOu},OU={_options.StaffOu},{_options.DomainDn}";
+        //if (!string.IsNullOrWhiteSpace(teamOu))
+        //    ous.Add($"OU={teamOu}");
+
+        //if (!string.IsNullOrWhiteSpace(campusOu))
+        //    ous.Add($"OU={campusOu}");
+
+        //if (!string.IsNullOrWhiteSpace(_options.StaffOu))
+        //    ous.Add($"OU={_options.StaffOu}");
+
+        // Combine all OU segments with domain DN
+        //var path = string.Join(",", ous) + "," + _options.DomainDn;
 
         // Flag rule: PasswordNeverExpires=true => ChangePasswordAtLogon must be false
         var changePasswordAtLogon = _options.ChangePasswordAtLogon;
@@ -81,4 +99,36 @@ public class PowerShellScriptGenerator : IScriptGenerator
 
     private static string EscapePs(string value)
         => value.Replace("\"", "`\""); // Escape double quotes for PowerShell strings
+
+    // Build distinguished name path safely
+    private string BuildOuPath(AdUserInput input)
+    {
+        var segments = new List<string>();
+
+        void AddOu(string? value)
+        {
+            if (!string.IsNullOrWhiteSpace(value))
+                segments.Add($"OU={value.Trim()}");
+        }
+
+        if (input.AccountType == AdAccountType.Student)
+        {
+            AddOu(input.Campus);
+            AddOu(_options.StudentsOu);
+        }
+        else
+        {
+            AddOu(input.Team);
+            AddOu(input.Campus);
+            AddOu(_options.StaffOu);
+        }
+
+
+        // Domain DN is already like "DC=cats,DC=local"
+        segments.Add(_options.DomainDn);
+
+        return string.Join(",", segments);
+    }
+
+
 }
