@@ -1,6 +1,7 @@
 using AdScript.Core.Services.Excel;
 using AdScript.Core.Models;
 using AdScript.Core.Services.Script;
+using AdScript.Core.Services.Path;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,10 @@ builder.Services.AddScoped<IScriptGenerator, PowerShellScriptGenerator>();
 builder.Services.AddScoped<IExcelUserInputReader, ExcelUserInputReader>();
 
 builder.Services.AddScoped<IExcelUserInputValidator, ExcelUserInputValidator>();
+
+builder.Services.AddScoped<IOuPathBuilder, OuPathBuilder>();
+
+builder.Services.AddScoped<IAdCommandBuilder, AdCommandBuilder>();
 
 var app = builder.Build();
 
