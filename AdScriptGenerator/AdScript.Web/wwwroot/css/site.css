@@ -20,3 +20,116 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.section-block {
+    margin-top: 24px;
+}
+
+.section-title {
+    margin-bottom: 12px;
+}
+
+.error-title {
+    color: #dc3545;
+}
+
+.error-subtitle {
+    margin-top: 0;
+    margin-bottom: 12px;
+    color: #dc3545;
+}
+
+.table-wrapper {
+    width: 100%;
+    max-width: 1100px;
+    border: 1px solid #ced4da;
+    background: #fff;
+    overflow-x: auto;
+}
+
+.result-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.result-table th,
+.result-table td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.result-table thead th {
+    font-weight: 700;
+    background: #f8f9fa;
+}
+
+.result-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin: 20px 0;
+}
+
+.stat-card {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+
+.stat-label {
+    font-size: 0.95rem;
+    color: #6c757d;
+    margin-bottom: 8px;
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #212529;
+}
+
+.stat-card.invalid.invalid-zero .stat-value {
+    /*gray*/
+    color: #6c757d;
+}
+
+.stat-card.valid .stat-value {
+    /*green*/
+    color: #198754;
+}
+
+.stat-card.invalid .stat-value {
+    /*red*/
+    color: #dc3545;
+}
+
+.script-box {
+    white-space: pre-wrap;
+    padding: 12px;
+    border: 1px solid #ccc;
+    background: #fff;
+    max-height: 420px;
+    overflow-y: auto;
+    border-radius: 8px;
+}
+
+.copy-message {
+    color: green;
+    margin-left: 10px;
+    display: none;
+}
+
+.download-warning {
+    color: #b00020;
+    margin-top: 8px;
+}
+
+

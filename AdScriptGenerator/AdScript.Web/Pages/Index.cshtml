@@ -1,9 +1,11 @@
 ﻿@page
 @model AdScript.Web.Pages.IndexModel
 
-<h2>Single user</h2>
 
-<form method="post">
+<details>
+    <summary>Single user (quick test)</summary>
+
+    <form method="post">
 
     <div asp-validation-summary="All" style="color: red; margin-bottom: 12px;"></div>
 
@@ -54,7 +56,12 @@
     </button>
 
 
-</form>
+    </form>
+
+</details>
+
+
+
 
 @if (!string.IsNullOrWhiteSpace(Model.GeneratedCommand))
 {
@@ -115,6 +122,33 @@
     </div>
 </form>
 
+@if (Model.TotalRows > 0)
+{
+        <h3>Upload Summary</h3>
+
+        <div class="stats-grid">
+            <div class="stat-card total">
+                <div class="stat-label">Total Rows</div>
+                <div class="stat-value">@Model.TotalRows</div>
+            </div>
+
+            <div class="stat-card valid">
+                <div class="stat-label">Valid Rows</div>
+                <div class="stat-value">@Model.ValidRowCount</div>
+            </div>
+
+            <div class="stat-card invalid @(Model.ErrorCount == 0 ? "invalid-zero" : "")">
+                <div class="stat-label">Invalid Rows</div>
+                <div class="stat-value">@Model.ErrorCount</div>
+            </div>
+
+                <div class="stat-card commands">
+                <div class="stat-label">Commands Generated</div>
+                <div class="stat-value">@Model.Commands.Count</div>
+            </div>
+        </div>
+}
+
 @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
 {
     <div style="color:red; margin-top:12px;">@Model.ErrorMessage</div>
@@ -122,111 +156,82 @@
 
 @if (Model.TotalRows > 0)
 {
-    <div style="margin-top:12px;">
-        <strong>Total rows:</strong> @Model.TotalRows
+    <div class="section-block">
+        <h3 class="section-title">Preview (Top @Model.PreviewRows.Count Valid Rows)</h3>
+
+        <div class="table-wrapper">
+            <table class="result-table">
+                <thead>
+                    <tr>
+                        <th>FirstName</th>
+                        <th>LastName</th>
+                        <th>ID</th>
+                        <th>Campus</th>
+                        <th>Team</th>
+                        <th>UpnSuffix</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model.PreviewRows)
+                    {
+                        <tr>
+                            <td>@r.FirstName</td>
+                            <td>@r.LastName</td>
+                            <td>@r.ID</td>
+                            <td>@r.Campus</td>
+                            <td>@r.Team</td>
+                            <td>@r.UpnSuffix</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
-
-    <h3>Preview (first @Model.PreviewRows.Count rows)</h3>
-
-    <table border="1" cellpadding="6" cellspacing="0">
-        <thead>
-            <tr>
-                <th>FirstName</th>
-                <th>LastName</th>
-                <th>ID</th>
-                <th>Campus</th>
-                <th>Team</th>
-                <th>UpnSuffix</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var r in Model.PreviewRows)
-            {
-                <tr>
-                    <td>@r.FirstName</td>
-                    <td>@r.LastName</td>
-                    <td>@r.ID</td>
-                    <td>@r.Campus</td>
-                    <td>@r.Team</td>
-                    <td>@r.UpnSuffix</td>
-                </tr>
-            }
-        </tbody>
-    </table>
 }
 
 @if (Model.ErrorCount > 0)
 {
-    <div style="margin-top:12px; color:#b00020;">
-        <strong>Validation errors:</strong> @Model.ErrorCount
-        <div>Valid rows: @Model.ValidRowCount / @Model.TotalRows</div>
-    </div>
+        <div class="section-block">
+            <h3 class="section-title error-title">Validation Errors</h3>
+            <p class="error-subtitle">Showing first 50 errors.</p>
 
-    <table border="1" cellpadding="6" cellspacing="0" style="margin-top:12px;">
-        <thead>
-            <tr>
-                <th>Row</th>
-                <th>Field</th>
-                <th>Message</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var e in Model.RowErrors.Take(50))
-            {
-                <tr>
-                    <td>@e.RowNumber</td>
-                    <td>@e.Field</td>
-                    <td>@e.Message</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-
-    <div style="margin-top:8px;">
-        Showing first 50 errors.
-    </div>
+            <div class="table-wrapper">
+                <table class="result-table">
+                    <thead>
+                        <tr>
+                            <th>Row</th>
+                            <th>Field</th>
+                            <th>Message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var e in Model.RowErrors.Take(50))
+                    {
+                                <tr>
+                                    <td>@e.RowNumber</td>
+                                    <td>@e.Field</td>
+                                    <td>@e.Message</td>
+                                </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
 }
 
 @if (Model.Commands?.Count > 0)
 {
     <hr />
-    <h3>Generated commands (@Model.Commands.Count)</h3>
-
-    <ul>
-        @foreach (var c in Model.Commands.Take(50))
-        {
-            <li><code>@c</code></li>
-        }
-    </ul>
-
-    <div style="margin-top:8px;">
-        Showing first 50 commands.
-    </div>
-
-    <h3>Combined script</h3>
-    <pre id="allCmd" style="white-space: pre-wrap; padding: 12px; border: 1px solid #ccc;">@Model.CombinedScript</pre>
+ 
+    <h3>Generated Script (@Model.Commands.Count)</h3>
+    <pre id="allCmd" class="script-box">@Model.CombinedScript</pre>
 
     <button type="button" onclick="copyAll()" id="copyAllBtn">Copy all</button>
-    <span id="copyAllMessage" style="color: green; margin-left: 10px; display: none;">Copied!</span>
+    <span id="copyAllMessage" class="copy-message">Copied!</span>
 
-    <script>
-        function copyAll() {
-            const text = document.getElementById('allCmd').innerText;
-
-            navigator.clipboard.writeText(text).then(function () {
-                const msg = document.getElementById('copyAllMessage');
-                msg.style.display = "inline";
-
-                setTimeout(function () {
-                    msg.style.display = "none";
-                }, 3000);
-            });
-        }
-    </script>
-
-    @if (Model.ErrorCount > 0)
+     @if (Model.ErrorCount > 0)
     {
-        <div style="color:#b00020; margin-top:8px;">
+        <div class="download-warning">
             Fix validation errors before downloading.
         </div>
     }
@@ -234,7 +239,24 @@
     <form method="post" asp-page-handler="Download" style="margin-top:12px;">
         <textarea name="CombinedScript" hidden>@Model.CombinedScript</textarea>
         <input type="hidden" name="DownloadFileName" value="@Model.DownloadFileName" />
-        <button type="submit" @(Model.ErrorCount > 0 ? "disabled" : "")>Download .ps1</button>
+        <button type="submit" @(Model.ErrorCount > 0 ? "disabled" : null)>Download .ps1</button>
     </form>
+
+
+    <script>
+        function copyAll() {
+            const text = document.getElementById('allCmd').innerText;
+
+            navigator.clipboard.writeText(text).then(function () {
+                const msg = document.getElementById('copyAllMessage');
+                msg.style.display = 'inline';
+
+                setTimeout(function () {
+                    msg.style.display = 'none';
+                }, 3000);
+            });
+        }
+    </script>
+
 }
 

@@ -18,12 +18,15 @@ namespace AdScript.Core.Services.Excel
             var result = new ExcelReadResult<AdUserInput>();
 
             using var wb = new XLWorkbook(xlsxStream);
-            var ws = wb.Worksheets.FirstOrDefault();
+            
+            var ws = wb.Worksheets.FirstOrDefault();            
+
             if (ws is null)
             {
                 result.Errors.Add("The Excel file does not contain any worksheet.");
                 return Task.FromResult(result);
             }
+                        
 
             var used = ws.RangeUsed();
             if (used is null)
