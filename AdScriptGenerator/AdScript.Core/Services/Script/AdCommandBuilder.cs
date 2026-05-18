@@ -12,16 +12,19 @@ public class AdCommandBuilder : IAdCommandBuilder
 		_options = options.Value;
 	}
 
-	public string Build(AdUserInput input, string path)
+
+    public string Build(AdUserInput input, string path)
 	{
 		if (input is null) throw new ArgumentNullException(nameof(input));
 
-		// Basic sanitisation
-		var firstName = (input.FirstName ?? string.Empty).Trim();
-		var lastNameRaw = (input.LastName ?? string.Empty).Trim();
+        // Basic sanitisation
+        //var firstName = (input.FirstName ?? string.Empty).Trim();
+        //var lastNameRaw = (input.LastName ?? string.Empty).Trim();
+        var firstName = SanitizeDisplayNamePart(input.FirstName);
+        var lastNameRaw = SanitizeDisplayNamePart(input.LastName);
 
-		// For display fields: remove "-" and "'", but keep normal spacing
-		var lastNameDisplay = RemoveChars(lastNameRaw, "-", "'");
+        // For display fields: remove "-" and "'", but keep normal spacing
+        var lastNameDisplay = RemoveChars(lastNameRaw, "-", "'");
 
 		var name = $"{firstName} {lastNameDisplay}".Trim();
 		var displayName = name;
@@ -29,11 +32,13 @@ public class AdCommandBuilder : IAdCommandBuilder
 		// Account naming (samAccountName <= 20 chars)
 		var lastNameAccount = RemoveChars(lastNameRaw, "-", "'", " ");
 		var sam = $"{firstName}.{lastNameAccount}".ToLowerInvariant();
-		sam = Truncate(sam, 20);
+        sam = SanitizeSamAccountName(sam);
+        sam = Truncate(sam, 20);
 
-		// UPN
-		var upnSuffix = (input.UpnSuffix ?? string.Empty).Trim().TrimStart('@');
-		var upn = $"{sam}@{upnSuffix}";
+        // UPN
+        //var upnSuffix = (input.UpnSuffix ?? string.Empty).Trim().TrimStart('@');
+        var upnSuffix = SanitizeUpnSuffix(input.UpnSuffix);
+        var upn = $"{sam}@{upnSuffix}";
 
 
 		// Flag rule: PasswordNeverExpires=true => ChangePasswordAtLogon must be false
@@ -75,8 +80,49 @@ public class AdCommandBuilder : IAdCommandBuilder
 		return result;
 	}
 
-	private static string EscapePs(string value)
-	=> value.Replace("\"", "`\""); // Escape double quotes for PowerShell strings
+    // Keep only safe characters allowed in samAccountName
+    private static string SanitizeSamAccountName(string value)
+    {
+        var allowed = value.Where(c =>
+            char.IsLetterOrDigit(c) ||
+            c == '.' ||
+            c == '-' ||
+            c == '_');
+
+        return new string(allowed.ToArray());
+    }
+
+
+    // Clean UPN suffix before building userPrincipalName
+    private static string SanitizeUpnSuffix(string? value)
+    {
+        return (value ?? string.Empty)
+            .Trim()
+            .TrimStart('@')
+            .Replace("\"", "")
+            .Replace("'", "")
+            .Replace(" ", "");
+    }
+
+    // Clean unsafe characters from name/display fields
+    private static string SanitizeDisplayNamePart(string? value)
+    {
+        return (value ?? string.Empty)
+            .Trim()
+            .Replace("$", "")
+            .Replace("`", "")
+            .Replace("\"", "")
+            .Replace(";", "");
+    }
+
+    // Escape values before inserting them into PowerShell strings
+    private static string EscapePs(string value)
+    {
+        return value
+            .Replace("`", "``")
+            .Replace("\"", "`\"")
+            .Replace("$", "`$");
+    }
 
 
 }

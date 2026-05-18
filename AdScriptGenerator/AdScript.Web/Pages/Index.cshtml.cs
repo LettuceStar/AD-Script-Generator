@@ -47,9 +47,7 @@ public class IndexModel(IScriptGenerator generator, IExcelUserInputReader reader
     public int ErrorCount { get; set; }
 
     public List<ExcelRowError> RowErrors { get; set; } = new();
-
-
-    
+        
     
 
     public void OnGet()
@@ -77,10 +75,26 @@ public class IndexModel(IScriptGenerator generator, IExcelUserInputReader reader
             return Page();
         }
 
-        var ext = Path.GetExtension(UploadFile.FileName);
+        var safeFileName = Path.GetFileName(UploadFile.FileName);
+        var ext = Path.GetExtension(safeFileName);
+
         if (!string.Equals(ext, ".xlsx", StringComparison.OrdinalIgnoreCase))
         {
             ErrorMessage = "Invalid file extension. Please upload a file ending with .xlsx.";
+            return Page();
+        }
+
+        // Allow only valid Excel MIME types
+        var allowedContentTypes = new[]
+        {
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "application/octet-stream"
+        };
+
+        // Reject unsupported file types
+        if (!allowedContentTypes.Contains(UploadFile.ContentType))
+        {
+            ErrorMessage = "Invalid file type. Please upload a valid Excel .xlsx file.";
             return Page();
         }
 
@@ -92,7 +106,9 @@ public class IndexModel(IScriptGenerator generator, IExcelUserInputReader reader
             return Page();
         }
 
-        // reanding: 1.open stream, 2.read with reader, 3.preview first 10 rows + error count (if any)
+        // Reading uploaded Excel file:
+        // 1.open stream, 2.read with reader,
+        // 3.preview first 10 rows + error count (if any)
         await using var stream = UploadFile.OpenReadStream();
         var read = await _reader.ReadAsync(stream, ct);
 
@@ -113,7 +129,7 @@ public class IndexModel(IScriptGenerator generator, IExcelUserInputReader reader
             v.Row.AccountType = UploadAccountType;
         }
 
-        ValidRowCount = validated.TotalValidRows;
+        
         ErrorCount = validated.TotalErrors;
         RowErrors = validated.Errors;
 
@@ -124,10 +140,46 @@ public class IndexModel(IScriptGenerator generator, IExcelUserInputReader reader
             .Take(10)
             .ToList();
 
+        Commands.Clear();
+
+        // Detect duplicate samAccountName values
+        var samNames = new HashSet<string>();
+
         // Generate commands for valid rows (M3)
-        Commands = validated.ValidRows
-            .Select(v => _generator.GenerateNewAdUserCommand(v.Row))
-            .ToList();
+        foreach (var v in validated.ValidRows)
+        {
+            var command = _generator.GenerateNewAdUserCommand(v.Row);
+
+            // Extract samAccountName from generated command
+            var match = System.Text.RegularExpressions.Regex.Match(
+                command,
+                "-SamAccountName \"([^\"]+)\"");
+
+            if (match.Success)
+            {
+                var sam = match.Groups[1].Value;
+
+                if (!samNames.Add(sam))
+                {
+                    RowErrors.Add(new ExcelRowError(
+                          v.RowNumber,
+                          "SamAccountName",
+                          $"Duplicate samAccountName detected: {sam}"
+                      ));
+
+                    ErrorCount++;
+                    continue;
+                }
+            }
+
+            Commands.Add(command);
+        }
+
+        ValidRowCount = Commands.Count;
+
+        //Commands = validated.ValidRows
+        //    .Select(v => _generator.GenerateNewAdUserCommand(v.Row))
+        //    .ToList();
 
         // Combine as a .ps1 text block
         CombinedScript = string.Join(Environment.NewLine, Commands);
@@ -141,11 +193,6 @@ public class IndexModel(IScriptGenerator generator, IExcelUserInputReader reader
     public IActionResult OnPostDownload()
     {
 
-        if (ErrorCount > 0)
-        {
-            ErrorMessage = "Fix validation errors before downloading.";
-            return Page();
-        }
 
         if (string.IsNullOrWhiteSpace(CombinedScript))
         {

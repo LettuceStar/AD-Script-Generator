@@ -13,6 +13,14 @@ public class OuPathBuilder : IOuPathBuilder
         _options = options.Value;
     }
 
+    private static string SanitizeOuValue(string value)
+    {
+        return value
+            .Replace("\"", "")
+            .Replace(",", "")
+            .Trim();
+    }
+
     // Build distinguished name path safely
     public string Build(AdUserInput input)
     {
@@ -21,7 +29,7 @@ public class OuPathBuilder : IOuPathBuilder
         void AddOu(string? value)
         {
             if (!string.IsNullOrWhiteSpace(value))
-                segments.Add($"OU={value.Trim()}");
+                segments.Add($"OU={SanitizeOuValue(value)}");
         }
 
         if (input.AccountType == AdUserInput.AdAccountType.Student)
@@ -44,4 +52,7 @@ public class OuPathBuilder : IOuPathBuilder
     }
 
 
+
+
 }
+

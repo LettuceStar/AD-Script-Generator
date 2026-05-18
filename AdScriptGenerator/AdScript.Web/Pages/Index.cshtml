@@ -232,14 +232,14 @@
      @if (Model.ErrorCount > 0)
     {
         <div class="download-warning">
-            Fix validation errors before downloading.
+            Some rows have validation errors. Valid commands can still be downloaded.
         </div>
     }
 
     <form method="post" asp-page-handler="Download" style="margin-top:12px;">
         <textarea name="CombinedScript" hidden>@Model.CombinedScript</textarea>
         <input type="hidden" name="DownloadFileName" value="@Model.DownloadFileName" />
-        <button type="submit" @(Model.ErrorCount > 0 ? "disabled" : null)>Download .ps1</button>
+        <button type="submit">Download .ps1</button>
     </form>
 
 
