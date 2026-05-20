@@ -1,6 +1,14 @@
 ﻿@page
 @model AdScript.Web.Pages.IndexModel
 
+<section class="hero">
+    <div>
+        <h1>AD Script Generator</h1>
+        <p>Generate secure Active Directory PowerShell scripts from Excel user lists.</p>
+    </div>
+
+    <span class="badge">Internal IT Tool</span>
+</section>
 
 <details>
     <summary>Single user (quick test)</summary>
@@ -61,8 +69,6 @@
 </details>
 
 
-
-
 @if (!string.IsNullOrWhiteSpace(Model.GeneratedCommand))
 {
     <hr />
@@ -72,7 +78,7 @@
         @Model.GeneratedCommand
     </pre>
 
-    <button type="button" onclick="copyCommand()" id="copyBtn">
+    <button type="button" onclick="copyCommand()" id="copyBtn" class="btn-secondary">
         Copy
     </button>
 
@@ -105,22 +111,31 @@
 
 <hr />
 
-<h2>Bulk (Excel)</h2>
+<div class="card">
+    <h2>Bulk Excel Upload</h2>
+    <p>Upload a student or staff Excel file to generate New-ADUser commands.</p>
 
-<form method="post" enctype="multipart/form-data" asp-page-handler="Upload">
-    <div>
-        <label>Account Type</label>
-        <select asp-for="UploadAccountType">
-            <option value="Staff">Staff</option>
-            <option value="Student">Student</option>
-        </select>
-    </div>
+    <form method="post" enctype="multipart/form-data" asp-page-handler="Upload">
+        <div>
+            <label>Account Type</label>
+            <select asp-for="UploadAccountType">
+                <option value="Staff">Staff</option>
+                <option value="Student">Student</option>
+            </select>
+        </div>
 
-    <div>
-        <input type="file" asp-for="UploadFile" accept=".xlsx" />
-        <button type="submit">Upload</button>
-    </div>
-</form>
+        <div>
+            <input type="file" asp-for="UploadFile" accept=".xlsx" />
+            <button type="submit" class="btn-primary">
+                Upload
+            </button>
+        </div>
+    </form>
+
+</div>
+
+
+
 
 @if (Model.TotalRows > 0)
 {
@@ -138,13 +153,13 @@
             </div>
 
             <div class="stat-card invalid @(Model.ErrorCount == 0 ? "invalid-zero" : "")">
-                <div class="stat-label">Invalid Rows</div>
+            <div class="stat-label">Rows With Errors</div>
                 <div class="stat-value">@Model.ErrorCount</div>
             </div>
 
                 <div class="stat-card commands">
                 <div class="stat-label">Commands Generated</div>
-                <div class="stat-value">@Model.Commands.Count</div>
+            <div class="stat-value">@(Model.Commands?.Count ?? 0)</div>
             </div>
         </div>
 }
@@ -226,7 +241,7 @@
     <h3>Generated Script (@Model.Commands.Count)</h3>
     <pre id="allCmd" class="script-box">@Model.CombinedScript</pre>
 
-    <button type="button" onclick="copyAll()" id="copyAllBtn">Copy all</button>
+    <button type="button" onclick="copyAll()" id="copyAllBtn" class="btn-secondary">Copy all</button>
     <span id="copyAllMessage" class="copy-message">Copied!</span>
 
      @if (Model.ErrorCount > 0)
@@ -239,7 +254,7 @@
     <form method="post" asp-page-handler="Download" style="margin-top:12px;">
         <textarea name="CombinedScript" hidden>@Model.CombinedScript</textarea>
         <input type="hidden" name="DownloadFileName" value="@Model.DownloadFileName" />
-        <button type="submit">Download .ps1</button>
+        <button type="submit" class="btn-success">Download .ps1</button>
     </form>
 
 
