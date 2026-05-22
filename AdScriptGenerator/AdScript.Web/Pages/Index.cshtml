@@ -124,12 +124,27 @@
             </select>
         </div>
 
+        <div class="upload-area" id="dropZone">
+            <div class="upload-icon">📂</div>
+            <div class="upload-text">Drag & drop your Excel file here</div>
+            <div class="upload-subtext">or use the button below</div>
+        </div>
+
         <div>
-            <input type="file" asp-for="UploadFile" accept=".xlsx" />
+            <input type="file"
+                   asp-for="UploadFile"
+                   accept=".xlsx"
+                   id="fileInput" />
+
             <button type="submit" class="btn-primary">
                 Upload
             </button>
         </div>
+
+        <div id="selectedFile" class="selected-file">
+            No file selected
+        </div>
+
     </form>
 
 </div>
@@ -256,22 +271,62 @@
         <input type="hidden" name="DownloadFileName" value="@Model.DownloadFileName" />
         <button type="submit" class="btn-success">Download .ps1</button>
     </form>
-
-
-    <script>
-        function copyAll() {
-            const text = document.getElementById('allCmd').innerText;
-
-            navigator.clipboard.writeText(text).then(function () {
-                const msg = document.getElementById('copyAllMessage');
-                msg.style.display = 'inline';
-
-                setTimeout(function () {
-                    msg.style.display = 'none';
-                }, 3000);
-            });
-        }
-    </script>
+    
 
 }
 
+
+<script>
+
+    function copyAll() {
+        const text = document.getElementById('allCmd').innerText;
+
+        navigator.clipboard.writeText(text).then(function () {
+            const msg = document.getElementById('copyAllMessage');
+            msg.style.display = 'inline';
+
+            setTimeout(function () {
+                msg.style.display = 'none';
+            }, 3000);
+        });
+    }
+
+
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const selectedFile = document.getElementById('selectedFile');
+
+    fileInput.addEventListener('change', function () {
+        selectedFile.textContent = fileInput.files.length > 0
+            ? `Selected file: ${fileInput.files[0].name}`
+            : 'No file selected';
+    });
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, e => {
+            e.preventDefault();
+            e.stopPropagation();
+        });
+    });
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => {
+            dropZone.classList.add('dragover');
+        });
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => {
+            dropZone.classList.remove('dragover');
+        });
+    });
+
+    dropZone.addEventListener('drop', e => {
+        const files = e.dataTransfer.files;
+
+        if (files.length > 0) {
+            fileInput.files = files;
+            selectedFile.textContent = `Selected file: ${files[0].name}`;
+        }
+    });
+</script>
