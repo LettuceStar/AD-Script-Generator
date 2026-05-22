@@ -41,5 +41,9 @@ public class AdUserInput
     public string UpnSuffix { get; set; } = string.Empty;
 
 
+    [MaxLength(200)]
+    [RegularExpression(@"^[A-Za-z0-9 _,;.-]*$",
+    ErrorMessage = "Groups can only contain letters, numbers, spaces, _, -, ., comma or semicolon.")]
+    public string? Groups { get; set; }
 
 }

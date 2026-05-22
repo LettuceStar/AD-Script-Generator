@@ -18,6 +18,16 @@
     <div asp-validation-summary="All" style="color: red; margin-bottom: 12px;"></div>
 
     <div>
+        <label>Account Type</label><br />
+        <select asp-for="Input.AccountType">
+            <option value="Staff">Staff</option>
+            <option value="Student">Student</option>
+        </select>
+        <span asp-validation-for="Input.AccountType" style="color: red;"></span>
+    </div>
+    <br />
+
+    <div>
         <label>First Name</label><br />
         <input asp-for="Input.FirstName" />
         <span asp-validation-for="Input.FirstName" style="color: red;"></span>
@@ -49,6 +59,13 @@
         <label>Team</label><br />
         <input asp-for="Input.Team" />
         <span asp-validation-for="Input.Team" style="color: red;"></span>
+    </div>
+    <br />
+
+    <div>
+        <label>Groups</label><br />
+        <input asp-for="Input.Groups" placeholder="Year11-Students; HBT-Students" />
+        <span asp-validation-for="Input.Groups" style="color: red;"></span>
     </div>
     <br />
 

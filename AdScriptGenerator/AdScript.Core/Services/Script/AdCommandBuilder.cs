@@ -63,7 +63,24 @@ public class AdCommandBuilder : IAdCommandBuilder
 		sb.Append($" -ChangePasswordAtLogon {(changePasswordAtLogon ? "$true" : "$false")}");
 		sb.Append($" -PasswordNeverExpires {(passwordNeverExpires ? "$true" : "$false")}");
 
-		return sb.ToString();
+
+        // Optional AD group memberships
+        if (!string.IsNullOrWhiteSpace(input.Groups))
+        {
+            var groups = input.Groups
+                .Split(new[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            foreach (var group in groups)
+            {
+                sb.AppendLine();
+
+                sb.Append(
+                    $"Add-ADGroupMember -Identity \"{EscapePs(group)}\" -Members \"{EscapePs(sam)}\"");
+            }
+        }
+
+
+        return sb.ToString();
 	}
 
 

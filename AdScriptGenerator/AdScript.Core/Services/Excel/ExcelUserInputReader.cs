@@ -70,6 +70,7 @@ namespace AdScript.Core.Services.Excel
                         ID = ReadCell(row, headerMap, HeaderAliases.ID),
                         Campus = ReadCell(row, headerMap, HeaderAliases.Campus),
                         Team = ReadCell(row, headerMap, HeaderAliases.Team),
+                        Groups = ReadCell(row, headerMap, HeaderAliases.Groups),
                         UpnSuffix = ReadCell(row, headerMap, HeaderAliases.UpnSuffix),
 
                     };

@@ -12,6 +12,7 @@ public static class HeaderAliases
     public const string Campus = "Campus";
     public const string Team = "Team";
     public const string UpnSuffix = "UpnSuffix";
+    public const string Groups = "Groups";
 
     // Aliases are compared after normalization (see NormalizeHeader).
     public static readonly Dictionary<string, string[]> Aliases = new(StringComparer.OrdinalIgnoreCase)
@@ -63,7 +64,7 @@ public static class HeaderAliases
             "department",
             "dept",
             "division",
-            "group"
+            
         },
 
         [UpnSuffix] = new[]
@@ -73,6 +74,16 @@ public static class HeaderAliases
             "upn",
             "domain",
             "email domain"
+        },
+
+        [Groups] = new[]
+        {
+            "Groups",
+            "Group",
+            "AD Groups",
+            "AD Group",
+            "Group Memberships",
+            "Group Membership"
         }
     };
 
