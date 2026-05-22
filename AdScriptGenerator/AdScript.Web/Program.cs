@@ -2,6 +2,7 @@ using AdScript.Core.Services.Excel;
 using AdScript.Core.Models;
 using AdScript.Core.Services.Script;
 using AdScript.Core.Services.Path;
+using System.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,5 +40,21 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapRazorPages();
+
+if (!app.Environment.IsDevelopment())
+{
+    var url = "http://localhost:5050";
+
+    _ = Task.Run(async () =>
+    {
+        await Task.Delay(1000);
+
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = url,
+            UseShellExecute = true
+        });
+    });
+}
 
 app.Run();
