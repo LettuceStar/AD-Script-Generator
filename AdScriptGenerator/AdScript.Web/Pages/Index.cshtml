@@ -115,7 +115,7 @@
     <h2>Bulk Excel Upload</h2>
     <p>Upload a student or staff Excel file to generate New-ADUser commands.</p>
 
-    <form method="post" enctype="multipart/form-data" asp-page-handler="Upload">
+    <form method="post" enctype="multipart/form-data" asp-page-handler="Upload" id="uploadForm">
         <div>
             <label>Account Type</label>
             <select asp-for="UploadAccountType">
@@ -136,9 +136,14 @@
                    accept=".xlsx"
                    id="fileInput" />
 
-            <button type="submit" class="btn-primary">
+            <button type="submit" class="btn-primary" id="uploadBtn">
                 Upload
             </button>
+
+            <span id="uploadStatus" class="upload-status">
+                Processing Excel file...
+            </span>
+
         </div>
 
         <div id="selectedFile" class="selected-file">
@@ -278,6 +283,7 @@
 
 <script>
 
+    // Copy all generated PowerShell commands to clipboard
     function copyAll() {
         const text = document.getElementById('allCmd').innerText;
 
@@ -291,17 +297,19 @@
         });
     }
 
-
+    // Enable drag-and-drop Excel file uploads
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
     const selectedFile = document.getElementById('selectedFile');
 
+    // Show selected filename after choosing a file
     fileInput.addEventListener('change', function () {
         selectedFile.textContent = fileInput.files.length > 0
             ? `Selected file: ${fileInput.files[0].name}`
             : 'No file selected';
     });
 
+    // Prevent browser default drag/drop behaviour
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
         dropZone.addEventListener(eventName, e => {
             e.preventDefault();
@@ -309,18 +317,21 @@
         });
     });
 
+    // Highlight upload area while dragging file over it
     ['dragenter', 'dragover'].forEach(eventName => {
         dropZone.addEventListener(eventName, () => {
             dropZone.classList.add('dragover');
         });
     });
 
+    // Remove highlight when drag leaves or file is dropped
     ['dragleave', 'drop'].forEach(eventName => {
         dropZone.addEventListener(eventName, () => {
             dropZone.classList.remove('dragover');
         });
     });
 
+    // Assign dropped file to the existing file input
     dropZone.addEventListener('drop', e => {
         const files = e.dataTransfer.files;
 
@@ -329,4 +340,16 @@
             selectedFile.textContent = `Selected file: ${files[0].name}`;
         }
     });
+
+    // Show upload processing state and prevent duplicate submissions
+    const uploadForm = document.getElementById('uploadForm');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const uploadStatus = document.getElementById('uploadStatus');
+
+    uploadForm.addEventListener('submit', function () {
+        uploadBtn.disabled = true;
+        uploadBtn.textContent = 'Processing...';
+        uploadStatus.style.display = 'inline';
+    });
+
 </script>

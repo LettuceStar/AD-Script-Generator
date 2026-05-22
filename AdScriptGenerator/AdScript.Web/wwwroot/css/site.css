@@ -253,3 +253,10 @@ textarea {
     color: #374151;
     font-weight: 600;
 }
+
+.upload-status {
+    display: none;
+    margin-left: 12px;
+    font-weight: 600;
+    color: #2563eb;
+}
