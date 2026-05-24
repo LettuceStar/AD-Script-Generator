@@ -2,7 +2,7 @@
 
 Generate standardized Active Directory PowerShell scripts from Excel user lists through a local ASP.NET Core Web application.
 
-![Hero UI](docs/images/hero-ui.png)
+<img src="Docs/Images/hero-ui.png" width="900">
 
 ---
 
@@ -24,19 +24,19 @@ Generate standardized Active Directory PowerShell scripts from Excel user lists 
 
 ### Single User Quick Test
 
-![Single User](docs/images/single-user.png)
+<img src="Docs/Images/single-user.png" width="900">
 
 ### Excel Validation Preview
 
-![Preview Table](docs/images/preview-table.png)
+<img src="Docs/Images/preview-table.png" width="900">
 
 ### Generated PowerShell Script
 
-![Generated Script](docs/images/generated-script.png)
+<img src="Docs/Images/generated-script.png" width="900">
 
 ### Local Executable Deployment
 
-![Local EXE](docs/images/local-exe.png)
+<img src="Docs/Images/local-exe.png" width="900">
 
 ---
 
@@ -72,7 +72,7 @@ AdScriptGenerator
 │   ├── Razor Pages
 │
 └── (Planned)
-└── AdScript.Blazor
+    └── AdScript.Blazor
 ```
 ---
 
@@ -82,6 +82,8 @@ AdScriptGenerator
 2. Extract the ZIP file
 3. Run `AdScript.Web.exe`
 
+Current release target: Windows x64.
+
 No .NET installation required.
 
 The application will automatically open in your browser at:
@@ -89,6 +91,12 @@ The application will automatically open in your browser at:
 ```text
 http://localhost:5050
 ```
+
+---
+
+## 🔐 Security Note
+
+This tool generates PowerShell scripts only. It does not execute commands or directly connect to Active Directory. Generated scripts should be reviewed by an administrator before running in a production environment.
 
 ---
 
