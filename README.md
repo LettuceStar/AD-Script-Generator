@@ -2,7 +2,7 @@
 
 Generate standardized Active Directory PowerShell scripts from Excel user lists through a local ASP.NET Core Web application.
 
-<img src="AdScriptGenerator/Docs/Images/hero-ui.png" width="900">
+<img src="AdScriptGenerator/Docs/Images/hero-ui.png" width="1100">
 
 ---
 
@@ -74,6 +74,17 @@ AdScriptGenerator
 └── (Planned)
     └── AdScript.Blazor
 ```
+---
+
+## 🔄 Example Workflow
+
+1. Launch the local Web application
+2. Upload a structured Excel file
+3. Validate user records
+4. Preview generated PowerShell commands
+5. Copy or download the generated `.ps1` script
+6. Execute the script in an Active Directory environment
+
 ---
 
 ## ▶ Running Locally
