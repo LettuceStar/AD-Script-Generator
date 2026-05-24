@@ -2,7 +2,7 @@
 
 Generate standardized Active Directory PowerShell scripts from Excel user lists through a local ASP.NET Core Web application.
 
-<img src="Docs/Images/hero-ui.png" width="900">
+<img src="AdScriptGenerator/Docs/Images/hero-ui.png" width="900">
 
 ---
 
@@ -24,19 +24,19 @@ Generate standardized Active Directory PowerShell scripts from Excel user lists 
 
 ### Single User Quick Test
 
-<img src="Docs/Images/single-user.png" width="900">
+<img src="AdScriptGenerator/Docs/Images/single-user.png" width="900">
 
 ### Excel Validation Preview
 
-<img src="Docs/Images/preview-table.png" width="900">
+<img src="AdScriptGenerator/Docs/Images/preview-table.png" width="900">
 
 ### Generated PowerShell Script
 
-<img src="Docs/Images/generated-script.png" width="900">
+<img src="AdScriptGenerator/Docs/Images/generated-script.png" width="900">
 
 ### Local Executable Deployment
 
-<img src="Docs/Images/local-exe.png" width="900">
+<img src="AdScriptGenerator/Docs/Images/local-exe.png" width="900">
 
 ---
 
