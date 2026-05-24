@@ -1,8 +1,50 @@
 # AD Script Generator
 
-A layered ASP.NET Core application that generates standardized PowerShell `New-ADUser` scripts from structured Excel input.
+Generate standardized Active Directory PowerShell scripts from Excel user lists through a local ASP.NET Core Web application.
 
-This project demonstrates enterprise-style architecture, separation of concerns, and automation principles commonly used in IT infrastructure management.
+![Hero UI](docs/images/hero-ui.png)
+
+---
+
+## ✨ Features
+
+- Bulk Excel upload for AD user provisioning
+- Drag-and-drop Excel support
+- Multi-worksheet Excel support
+- Automated PowerShell `New-ADUser` generation
+- Optional AD group membership generation
+- Validation and sanitisation pipeline
+- Script preview and downloadable `.ps1` output
+- Local self-hosted Web App deployment
+- Single-user quick testing mode
+
+---
+
+## 📸 Screenshots
+
+### Single User Quick Test
+
+![Single User](docs/images/single-user.png)
+
+### Excel Validation Preview
+
+![Preview Table](docs/images/preview-table.png)
+
+### Generated PowerShell Script
+
+![Generated Script](docs/images/generated-script.png)
+
+### Local Executable Deployment
+
+![Local EXE](docs/images/local-exe.png)
+
+---
+
+## 🚀 Download Release
+
+Download the latest Windows release from:
+
+[Download Latest Release](../../releases)
 
 ---
 
@@ -22,16 +64,32 @@ The solution follows a layered design to ensure scalability and reusability:
 AdScriptGenerator
 │
 ├── AdScript.Core
-│ ├── Models
-│ ├── Services
-│ ├── Validation
+│   ├── Models
+│   ├── Services
+│   ├── Validation
 │
 ├── AdScript.Web
-│ ├── Razor Pages
+│   ├── Razor Pages
 │
 └── (Planned)
 └── AdScript.Blazor
 ```
+---
+
+## ▶ Running Locally
+
+1. Download the latest release
+2. Extract the ZIP file
+3. Run `AdScript.Web.exe`
+
+No .NET installation required.
+
+The application will automatically open in your browser at:
+
+```text
+http://localhost:5050
+```
+
 ---
 
 ### 🔹 Core Layer
@@ -67,7 +125,7 @@ The Web layer acts purely as a UI wrapper over the Core logic.
 - .NET 8
 - ASP.NET Core Razor Pages
 - Clean architecture principles
-- Excel processing (ClosedXML / EPPlus)
+- Excel processing (ClosedXML)
 - PowerShell script generation
 
 ---
@@ -104,4 +162,19 @@ The Web layer acts purely as a UI wrapper over the Core logic.
 - Prevent conflicting password flags
 - Input sanitation before script generation
 - Defensive rule enforcement
+
+---
+
+## 👤 Author
+
+Raymond Wang  
+Master of Information Technology and Systems (MITS) Graduate  
+Certificate IV in Information Technology  
+
+Focus areas:
+- C#
+- ASP.NET Core
+- IT Automation
+- Infrastructure Tooling
+
 
