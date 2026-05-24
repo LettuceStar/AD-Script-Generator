@@ -102,6 +102,14 @@ The application will automatically open in your browser at:
 ```text
 http://localhost:5050
 ```
+---
+
+### Example Excel Files
+
+Sample Excel files are included for testing and demonstration purposes:
+
+- [Sample Staff List](Examples/sample-staff-list.xlsx)
+- [Sample Student List](Examples/sample-student-list.xlsx)
 
 ---
 
