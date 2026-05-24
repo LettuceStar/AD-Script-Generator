@@ -108,8 +108,8 @@ http://localhost:5050
 
 Sample Excel files are included for testing and demonstration purposes:
 
-- [Sample Staff List](Examples/sample-staff-list.xlsx)
-- [Sample Student List](Examples/sample-student-list.xlsx)
+- [Sample Staff List](./Examples/sample-staff-list.xlsx)
+- [Sample Student List](./Examples/sample-student-list.xlsx)
 
 ---
 
